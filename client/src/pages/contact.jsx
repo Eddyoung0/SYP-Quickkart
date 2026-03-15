@@ -343,13 +343,7 @@ const Contact = () => {
                     Business Hours
                   </h4>
                   <p className="text-gray-600 text-sm">
-                    Monday - Friday: 9:00 AM - 6:00 PM
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    Saturday: 10:00 AM - 4:00 PM
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    Sunday: Closed
+                    24/7 Service
                   </p>
                 </div>
 
@@ -363,8 +357,7 @@ const Contact = () => {
                   </h4>
                   <p className="text-gray-600 text-sm">
                     Quickkart Headquarters<br />
-                    Mumbai, Maharashtra<br />
-                    India - 400001
+                    Itahari, Sunsari<br />
                   </p>
                 </div>
 

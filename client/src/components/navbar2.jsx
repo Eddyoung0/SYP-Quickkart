@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { clearAuthSession } from '../lib/auth';
+import { getCartCount, getFavouriteIds, SHOP_DATA_EVENT } from '../lib/shopStorage';
 
 const navbar2 = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -11,6 +12,8 @@ const navbar2 = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 1100);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [favouriteCount, setFavouriteCount] = useState(() => getFavouriteIds().length);
+  const [cartCount, setCartCount] = useState(() => getCartCount());
 
   useEffect(() => {
     const handleResize = () => {
@@ -29,6 +32,21 @@ const navbar2 = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateCounts = () => {
+      setFavouriteCount(getFavouriteIds().length);
+      setCartCount(getCartCount());
+    };
+
+    window.addEventListener(SHOP_DATA_EVENT, updateCounts);
+    window.addEventListener('storage', updateCounts);
+
+    return () => {
+      window.removeEventListener(SHOP_DATA_EVENT, updateCounts);
+      window.removeEventListener('storage', updateCounts);
     };
   }, []);
 
@@ -69,15 +87,15 @@ const navbar2 = () => {
                 {/* Dropdown Menu */}
                 {item.dropdown && (
                   <div className="absolute left-0 mt-0 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-2 z-10 border border-gray-200">
-                    <a href="#" className="block px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
+                    <button onClick={() => navigate('/product/electronics')} className="block w-full text-left px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
                       Electronics
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
+                    </button>
+                    <button onClick={() => navigate('/product/groceries')} className="block w-full text-left px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
                       Groceries
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
+                    </button>
+                    <button onClick={() => navigate('/product')} className="block w-full text-left px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
                       Clothing 
-                    </a>
+                    </button>
                   </div>
                 )}
               </div>
@@ -102,17 +120,27 @@ const navbar2 = () => {
         {/* Right Actions */}
         <div className="flex items-center gap-8 h-full">
           {/* Favourite */}
-          <button className={`${isSmallScreen ? 'hidden' : 'flex'} items-center gap-2 text-gray-700 hover:text-[#007E5D] transition-colors duration-200`}
+          <button className={`${isSmallScreen ? 'hidden' : 'flex'} relative items-center gap-2 text-gray-700 hover:text-[#007E5D] transition-colors duration-200`}
           onClick={() => navigate('/favourite')}
           title="Favourite">
             <Heart size={24} />
+            {favouriteCount > 0 && (
+              <span className="absolute -right-2 -top-1 min-w-5 h-5 px-1 rounded-full bg-[#007E5D] text-[10px] text-white grid place-items-center">
+                {favouriteCount}
+              </span>
+            )}
           </button>
 
           {/* Shopping Cart */}
-          <button className={`${isSmallScreen ? 'hidden' : 'flex'} items-center gap-2 text-gray-700 hover:text-[#007E5D] transition-colors duration-200`}
+          <button className={`${isSmallScreen ? 'hidden' : 'flex'} relative items-center gap-2 text-gray-700 hover:text-[#007E5D] transition-colors duration-200`}
           onClick={() => navigate('/cart')}
           title="Cart">
             <ShoppingCart size={24} />
+            {cartCount > 0 && (
+              <span className="absolute -right-2 -top-1 min-w-5 h-5 px-1 rounded-full bg-[#007E5D] text-[10px] text-white grid place-items-center">
+                {cartCount}
+              </span>
+            )}
           </button>
 
           {/* User Profile Dropdown */}
@@ -138,11 +166,11 @@ const navbar2 = () => {
                 </button>
                 <button 
                   onClick={() => {
-                    navigate('/settings');
+                    navigate('/orders');
                     setProfileDropdownOpen(false);
                   }}
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
-                  Settings
+                  Your Orders
                 </button>
                 <button 
                   onClick={() => {
@@ -204,15 +232,15 @@ const navbar2 = () => {
                 </button>
                 {item.dropdown && (
                   <div className="pl-4 space-y-2 py-2">
-                    <a href="#" className="block text-gray-600 hover:text-gray-900 text-sm py-1">
-                      Option 1
-                    </a>
-                    <a href="#" className="block text-gray-600 hover:text-gray-900 text-sm py-1">
-                      Option 2
-                    </a>
-                    <a href="#" className="block text-gray-600 hover:text-gray-900 text-sm py-1">
-                      Option 3
-                    </a>
+                    <button onClick={() => { navigate('/product/electronics'); setMobileMenuOpen(false); }} className="block text-left text-gray-600 hover:text-gray-900 text-sm py-1">
+                      Electronics
+                    </button>
+                    <button onClick={() => { navigate('/product/groceries'); setMobileMenuOpen(false); }} className="block text-left text-gray-600 hover:text-gray-900 text-sm py-1">
+                      Groceries
+                    </button>
+                    <button onClick={() => { navigate('/product'); setMobileMenuOpen(false); }} className="block text-left text-gray-600 hover:text-gray-900 text-sm py-1">
+                      Clothing
+                    </button>
                   </div>
                 )}
               </div>
@@ -223,12 +251,12 @@ const navbar2 = () => {
               <button className="flex-1 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] py-2 text-sm font-medium transition-colors"
               onClick={() => navigate('/favourite')}>
                 <Heart size={20} />
-                <span>Favourite</span>
+                <span>Favourite {favouriteCount > 0 ? `(${favouriteCount})` : ''}</span>
               </button>
               <button className="flex-1 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] py-2 text-sm font-medium transition-colors"
               onClick={() => navigate('/cart')}>
                 <ShoppingCart size={20} />
-                <span>Cart</span>
+                <span>Cart {cartCount > 0 ? `(${cartCount})` : ''}</span>
               </button>
               <button className="flex-1 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] py-2 text-sm font-medium transition-colors"
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}>
@@ -251,12 +279,12 @@ const navbar2 = () => {
                 </button>
                 <button 
                   onClick={() => {
-                    navigate('/settings');
+                    navigate('/orders');
                     setProfileDropdownOpen(false);
                     setMobileMenuOpen(false);
                   }}
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors rounded">
-                  Settings
+                  Your Orders
                 </button>
                 <button 
                   onClick={() => {
@@ -274,7 +302,8 @@ const navbar2 = () => {
                     setProfileDropdownOpen(false);
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 text-sm transition-colors rounded">
+                  className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 text-sm transition-colors rounded"
+                  >
                   Logout
                 </button>
               </div>

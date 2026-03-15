@@ -3,8 +3,16 @@ import Navbar2 from './components/navbar2';
 import Footer from './components/footer';
 import Home from './pages/home';
 import Product from './pages/product';
+import Electronics from './pages/electronics';
+import Groceries from './pages/groceries';
+import ProductDetails from './pages/productDetails';
+import Favourite from './pages/favourite';
+import Cart from './pages/cart';
 import AboutUs from './pages/aboutUs';
 import Contact from './pages/contact';
+import Profile from './pages/profile';
+import YourOrders from './pages/yourOrders';
+import Help from './pages/help';
 import Login from './pages/authentication/login';
 import Register from './pages/authentication/register';
 import Error404 from './pages/error404page';
@@ -26,10 +34,11 @@ const App = () => {
     setIsLoggedIn(isLoggedInWithValidSession());
   }, [location.pathname]);
 
-  const validPaths = ['/', '/product', '/login', '/register', '/about-us', '/contact','/forgot-password'];
+  const validPaths = ['/', '/product', '/product/electronics', '/product/groceries', '/favourite', '/cart', '/profile', '/orders', '/help', '/login', '/register', '/about-us', '/contact', '/forgot-password'];
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isForm = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password';
-  const wrongURL = !validPaths.includes(location.pathname);
+  const isProductDetailsRoute = /^\/product\/\d+$/.test(location.pathname);
+  const wrongURL = !validPaths.includes(location.pathname) && !isProductDetailsRoute;
 
   return (
     <ThemeProvider>
@@ -41,8 +50,16 @@ const App = () => {
     <Routes>
       <Route path='/' element={<Home/>}/>
       <Route path='/product' element={<Product/>}/>
+      <Route path='/product/electronics' element={<Electronics/>}/>
+      <Route path='/product/groceries' element={<Groceries/>}/>
+      <Route path='/favourite' element={<Favourite/>}/>
+      <Route path='/cart' element={<Cart/>}/>
+      <Route path='/product/:id' element={<ProductDetails/>}/>
       <Route path='/about-us' element={<AboutUs/>}/>
       <Route path='/contact' element={<Contact/>}/>
+      <Route path='/profile' element={<Profile/>}/>
+      <Route path='/orders' element={<YourOrders/>}/>
+      <Route path='/help' element={<Help/>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/register' element={<Register/>}/>
       <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
