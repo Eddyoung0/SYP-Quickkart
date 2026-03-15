@@ -20,6 +20,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';  
 import authRoute from './routes/auth.js';
+import productRoute from './routes/products.js';
+import categoryRoute from './routes/categories.js';
+import chatbotRoute from './routes/chatbot.js';
 
 dotenv.config()
 
@@ -28,6 +31,9 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', authRoute);
+app.use('/api/products', productRoute);
+app.use('/api/categories', categoryRoute);
+app.use('/api/chatbot', chatbotRoute);
 
 
 //PORT connection on 5000

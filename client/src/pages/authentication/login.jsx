@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { ShoppingCart, Eye, EyeOff} from 'lucide-react'
 import LoginSvg from '../../img/authenticationImg/login.png';
+import { setAuthSession } from '../../lib/auth';
 
 const login = () => {
   const [showPassword, setShowPassword] = useState(false); 
@@ -25,10 +26,9 @@ const login = () => {
         setAlertMessage(response.data.message);
         setShowAlert(true);
 
-        // Store token and user info
+        // Store session with a 3-day expiry
         if (response.data.token) {
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('user', JSON.stringify(response.data.user || {}));
+          setAuthSession(response.data.token, response.data.user || {});
         }
 
         setTimeout(() => {

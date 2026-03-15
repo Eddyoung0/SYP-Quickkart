@@ -4,130 +4,117 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
-const navbar = () => {
-  const [openDropdown, setOpenDropdown] = useState(null);
+const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 1100);
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 1024);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 1100);
+      setIsSmallScreen(window.innerWidth < 1024);
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const menuItems = [
-    {label: 'Home', dropdown: false, link: '/' },
-    { label: 'Products', dropdown: true, link: '/product' },
-    { label: 'About Us', dropdown: false, link: '/about-us' },
-    { label: 'Contact', dropdown: false, link: '/contact' },
+    { label: 'Home', link: '/' },
+    { label: 'Products', link: '/product', dropdown: true },
+    { label: 'Deals', link: '/product' },
+    { label: 'Blog', link: '/about-us' },
+    { label: 'Contact', link: '/contact' },
   ];
 
   const navigate = useNavigate();
 
   return (
-    <nav className="bg-white shadow-md fixed w-full top-0 z-50 h-18">
-      <div className="mx-auto px-6 py-4 flex items-center justify-between w-full px-20">
-        
-        {/* Logo and Menu - Left Side */}
-        <div className="flex items-center gap-20">
+    <nav className="bg-white shadow-sm fixed w-full top-0 z-50 border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-            <span><FontAwesomeIcon icon={faShoppingCart} className='text-2xl px-2'/></span>
-            <span className='text-gray-900 text-2xl font-bold'>Quick</span>
-            <span className='text-[#007E5D] text-2xl font-bold'>kart</span>
+          <div className="flex-shrink-0 cursor-pointer flex items-center relative right-15" onClick={() => navigate('/')}>
+            <span><FontAwesomeIcon icon={faShoppingCart} className='text-xl px-1.5'/></span>
+            <span className='text-gray-900 text-xl font-bold'>Quick</span>
+            <span className='text-[#007E5D] text-xl font-bold'>kart</span>
           </div>
 
-          {/* Left Menu */}
-          <div className={`${isSmallScreen ? 'hidden' : 'flex'} items-center gap-8`}>
+          {/* Nav Links - Desktop */}
+          <div className={`${isSmallScreen ? 'hidden' : 'flex'} items-center gap-6`}>
             {menuItems.map((item) => (
               <div key={item.label} className="relative group">
-                <button className="flex items-center gap-2 text-gray-700 hover:text-[#007E5D] transition-colors duration-200 text-md"
-                onClick = {() => navigate(item.link)}>
+                <button
+                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+                  onClick={() => navigate(item.link)}
+                >
                   {item.label}
-                  {item.dropdown && (
-                    <ChevronDown size={16} className="group-hover:rotate-180 transition-transform duration-300 " />
-                  )}
+                  {item.dropdown && <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />}
                 </button>
-                
-                {/* Dropdown Menu */}
                 {item.dropdown && (
-                  <div className="absolute left-0 mt-0 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 py-2 z-10 border border-gray-200">
-                    <a href="#" className="block px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
-                      Electronics
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
-                      Groceries
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-gray-700 hover:text-[#007E5D] hover:bg-gray-100 text-sm transition-colors">
-                      Clothing 
-                    </a>
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-10 border border-gray-100">
+                    <a href="#" className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm">Electronics</a>
+                    <a href="#" className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm">Fashion</a>
+                    <a href="#" className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm">Home & Kitchen</a>
                   </div>
                 )}
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-6">
-          <button className={`${isSmallScreen ? 'hidden' : 'block'} text-gray-700 hover:text-gray-900 transition-colors duration-200 text-md font-medium`}
-          onClick={() => navigate('/register')}>
-            Sign in
-          </button>
-          <button className={`${isSmallScreen ? 'hidden' : 'block'} bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-2 rounded-lg transition-colors duration-200 text-md`}
-          onClick={() => navigate('/login')}>
-            Login
-          </button>
+          {/* Right Auth Buttons */}
+          <div className="flex items-center gap-4 relative left-15">
+            <div className={`${isSmallScreen ? 'hidden' : 'flex'} items-center gap-5`}>
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-medium text-[#007E5D] border border-[#007E5D] hover:bg-[#007E5D] hover:text-white transition-colors"
+                onClick={() => navigate('/register')}
+              >
+                Sign In
+              </button>
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-[#007E5D] text-white hover:bg-[#006B4D] transition-colors"
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </button>
+            </div>
 
-          {/* Hamburger Icon - Mobile */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`${isSmallScreen ? 'block' : 'hidden'} text-gray-700 hover:text-gray-900 transition-colors`}
-          >
-            {mobileMenuOpen ? (
-              <X size={24} />
-            ) : (
-              <Menu size={24} />
-            )}
-          </button>
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`${isSmallScreen ? 'block' : 'hidden'} text-gray-700 hover:text-gray-900 transition-colors`}
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && isSmallScreen && (
-        <div className="bg-white border-t border-gray-200">
-          <div className="px-6 py-4 space-y-4">
+        <div className="bg-white border-t border-gray-100 shadow-lg">
+          <div className="px-4 py-4 space-y-1">
             {menuItems.map((item) => (
-              <div key={item.label}>
-                <button className="w-full text-left flex items-center justify-between text-gray-700 hover:text-gray-900 py-2 text-sm">
-                  {item.label}
-                  {item.dropdown && <ChevronDown size={16} />}
-                </button>
-                {item.dropdown && (
-                  <div className="pl-4 space-y-2 py-2">
-                    <a href="#" className="block text-gray-600 hover:text-gray-900 text-sm py-1">
-                      Option 1
-                    </a>
-                    <a href="#" className="block text-gray-600 hover:text-gray-900 text-sm py-1">
-                      Option 2
-                    </a>
-                    <a href="#" className="block text-gray-600 hover:text-gray-900 text-sm py-1">
-                      Option 3
-                    </a>
-                  </div>
-                )}
-              </div>
-            ))}
-            
-            {/* Mobile Action Buttons */}
-            <div className="border-t border-gray-200 pt-4 space-y-3">
-              <button className="w-full text-gray-700 hover:text-gray-900 transition-colors py-2 text-sm font-medium">
-                Sign in
+              <button
+                key={item.label}
+                className="w-full text-left text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg py-2.5 px-3 text-sm font-medium transition-colors"
+                onClick={() => {
+                  navigate(item.link);
+                  setMobileMenuOpen(false);
+                }}
+              >
+                {item.label}
               </button>
-              <button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-2 rounded-lg transition-colors text-sm">
+            ))}
+
+            <div className="border-t border-gray-100 pt-3 mt-3 flex items-center gap-3 px-3">
+              <button
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-[#007E5D] border border-[#007E5D] hover:bg-[#007E5D] hover:text-white transition-colors"
+                onClick={() => navigate('/register')}
+              >
+                Sign In
+              </button>
+              <button
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#007E5D] text-white hover:bg-[#006B4D] transition-colors"
+                onClick={() => navigate('/login')}
+              >
                 Login
               </button>
             </div>
@@ -138,4 +125,4 @@ const navbar = () => {
   )
 }
 
-export default navbar
+export default Navbar

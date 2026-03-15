@@ -43,5 +43,11 @@ CREATE TABLE IF NOT EXISTS comments(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- // Update only the profile_image for that specific user
 -- UPDATE users SET profile_image = '/uploads/users/profile_123.jpg' WHERE id = 123;

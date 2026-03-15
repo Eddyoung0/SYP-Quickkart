@@ -1,39 +1,279 @@
-import React, { useEffect } from 'react';
-import ProductDrawer from '../components/ProductDrawer';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Star, SlidersHorizontal, Heart, ShoppingBag } from 'lucide-react';
 
-const product = () => {
+const products = [
+  {
+    id: 1,
+    name: 'Classic Linen Shirt',
+    category: 'Shirts',
+    price: 49,
+    rating: 4.8,
+    image:
+      'https://images.unsplash.com/photo-1593032465171-8bd6322a0d4d?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 2,
+    name: 'Urban Fit Blazer',
+    category: 'Jackets',
+    price: 119,
+    rating: 4.6,
+    image:
+      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 3,
+    name: 'Essential Black Dress',
+    category: 'Dresses',
+    price: 89,
+    rating: 4.7,
+    image:
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 4,
+    name: 'Cozy Knit Sweater',
+    category: 'Sweaters',
+    price: 69,
+    rating: 4.4,
+    image:
+      'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 5,
+    name: 'Tailored Wide Pants',
+    category: 'Pants',
+    price: 74,
+    rating: 4.3,
+    image:
+      'https://images.unsplash.com/photo-1475180098004-ca77a66827be?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 6,
+    name: 'Minimal White Sneakers',
+    category: 'Shoes',
+    price: 95,
+    rating: 4.9,
+    image:
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 7,
+    name: 'Street Denim Jacket',
+    category: 'Jackets',
+    price: 105,
+    rating: 4.5,
+    image:
+      'https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80',
+  },
+  {
+    id: 8,
+    name: 'Soft Everyday Hoodie',
+    category: 'Sweaters',
+    price: 62,
+    rating: 4.2,
+    image:
+      'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&w=900&q=80',
+  },
+];
+
+const categories = ['All', 'Shirts', 'Jackets', 'Dresses', 'Sweaters', 'Pants', 'Shoes'];
+const ratingOptions = [4, 3, 2];
+
+const Product = () => {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [priceLimit, setPriceLimit] = useState(130);
+  const [minRating, setMinRating] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  return (
-    <>
-      {/* Top Banner Section with Collections */}
-      <section className="pt-24 pb-12 bg-gradient-to-r from-gray-100 to-gray-50">
-        <div className="container mx-auto px-4 lg:px-20 flex flex-col md:flex-row justify-end items-left gap-10">
+  const filteredProducts = useMemo(() => {
+    return products.filter((item) => {
+      const categoryMatch =
+        selectedCategory === 'All' ? true : item.category === selectedCategory;
+      const priceMatch = item.price <= priceLimit;
+      const ratingMatch = item.rating >= minRating;
 
-            {/* Banner Content */}
-            <div className="flex flex-col items-start p-5 md:text-left">
-              <p className="text-green-600 font-semibold text-sm mb-2 uppercase tracking-wider">
-                ✨ Collections
+      return categoryMatch && priceMatch && ratingMatch;
+    });
+  }, [selectedCategory, priceLimit, minRating]);
+
+  return (
+    <div className="bg-[#f8f8f6] min-h-screen pt-24 pb-14">
+      <div className="mx-auto max-w-[1300px] px-4 sm:px-6 lg:px-10">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#ebe9e4] via-[#f4f3ef] to-[#e7e4dd] px-6 py-10 sm:px-10 lg:px-14 lg:py-14 shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/30 blur-2xl" />
+          <div className="absolute -bottom-14 left-1/2 h-40 w-40 rounded-full bg-white/40 blur-2xl" />
+
+          <div className="relative z-10 grid gap-8 lg:grid-cols-[1.3fr_1fr] items-center">
+            <div>
+              <p className="text-xs tracking-[0.3em] uppercase text-neutral-600 mb-3">Spring Fashion Collection</p>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-neutral-900 leading-tight">
+                20% Off One Day Only On
+                <span className="block italic font-light">Special Gift Picks</span>
+              </h1>
+              <p className="mt-4 text-neutral-600 max-w-xl leading-relaxed">
+                Discover premium styles curated for everyday confidence. Refresh your wardrobe with elegant silhouettes and timeless pieces.
               </p>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Explore The Various Collection
-              </h2>
-              <p className="text-gray-600 text-lg mb-6 leading-relaxed">
-                Don't miss out to shopping collection from us! You'll not see it down.
-              </p>
-              <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-colors inline-block">
-                Shop Now →
+              <button className="mt-7 inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-neutral-700">
+                Shop The Collection
+                <ShoppingBag size={16} />
               </button>
             </div>
-          </div>
-      </section>
 
-      {/* Main Products Drawer */}
-      <ProductDrawer />
-    </>
+            <div className="hidden lg:flex justify-end">
+              <img
+                src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80"
+                alt="Promotional fashion banner"
+                className="h-[280px] w-[380px] rounded-2xl object-cover shadow-[0_14px_28px_rgba(0,0,0,0.14)]"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
+          <aside className="h-max rounded-2xl bg-white p-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-neutral-200/70">
+            <button
+              type="button"
+              onClick={() => setShowFilters((prev) => !prev)}
+              className="mb-5 flex w-full items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 text-sm font-medium text-neutral-700 lg:hidden"
+            >
+              Filter Products
+              <SlidersHorizontal size={17} />
+            </button>
+
+            <div className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-7`}>
+              <div>
+                <h2 className="text-sm font-semibold tracking-wide text-neutral-900 uppercase mb-4">Category</h2>
+                <div className="space-y-2.5">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => setSelectedCategory(category)}
+                      className={`w-full rounded-lg px-3 py-2.5 text-left text-sm transition ${
+                        selectedCategory === category
+                          ? 'bg-neutral-900 text-white shadow-md'
+                          : 'text-neutral-700 hover:bg-neutral-100'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-sm font-semibold tracking-wide text-neutral-900 uppercase mb-4">Price</h2>
+                <input
+                  type="range"
+                  min="40"
+                  max="130"
+                  value={priceLimit}
+                  onChange={(e) => setPriceLimit(Number(e.target.value))}
+                  className="range range-sm"
+                />
+                <div className="mt-3 flex items-center justify-between text-sm text-neutral-500">
+                  <span>$40</span>
+                  <span className="font-semibold text-neutral-900">Up to ${priceLimit}</span>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-sm font-semibold tracking-wide text-neutral-900 uppercase mb-4">Rating</h2>
+                <div className="space-y-2.5">
+                  {ratingOptions.map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => setMinRating(rating)}
+                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition ${
+                        minRating === rating
+                          ? 'bg-neutral-900 text-white'
+                          : 'text-neutral-700 hover:bg-neutral-100'
+                      }`}
+                    >
+                      <span>{rating}+ Stars</span>
+                      <span className="flex items-center gap-1">
+                        <Star size={14} className="fill-current" />
+                      </span>
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setMinRating(0)}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-left text-sm text-neutral-600 transition hover:bg-neutral-100"
+                  >
+                    Clear Rating Filter
+                  </button>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div>
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold text-neutral-900">Featured Products</h2>
+                <p className="text-sm text-neutral-500 mt-1">{filteredProducts.length} items found</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {filteredProducts.map((item) => (
+                <article
+                  key={item.id}
+                  className="group rounded-2xl bg-white border border-neutral-200/70 shadow-[0_8px_24px_rgba(0,0,0,0.05)] overflow-hidden transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)]"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-neutral-700 shadow transition hover:bg-white hover:text-red-500"
+                    >
+                      <Heart size={16} />
+                    </button>
+                  </div>
+
+                  <div className="p-4">
+                    <p className="text-xs uppercase tracking-wider text-neutral-500">{item.category}</p>
+                    <h3 className="mt-1 text-base font-semibold text-neutral-900">{item.name}</h3>
+
+                    <div className="mt-2 flex items-center gap-1.5 text-amber-500">
+                      <Star size={15} className="fill-current" />
+                      <span className="text-sm font-medium text-neutral-700">{item.rating}</span>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-lg font-semibold text-neutral-900">${item.price}</span>
+                      <button
+                        type="button"
+                        className="rounded-full border border-neutral-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {filteredProducts.length === 0 && (
+              <div className="mt-8 rounded-2xl border border-dashed border-neutral-300 bg-white p-10 text-center text-neutral-600">
+                No products match your selected filters.
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
   );
 };
 
-export default product;
+export default Product;

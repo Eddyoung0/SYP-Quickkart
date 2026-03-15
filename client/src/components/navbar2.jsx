@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { ChevronDown, Menu, X, ShoppingCart, Heart, User } from 'lucide-react'
+import { Search, ChevronDown, Menu, X, ShoppingCart, Heart, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { clearAuthSession } from '../lib/auth';
 
 const navbar2 = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 1100);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,12 +43,12 @@ const navbar2 = () => {
 
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
-      <div className="mx-auto px-6 flex items-center justify-between w-full px-20 h-18">
+      <div className="mx-auto flex items-center justify-between w-full px-20 h-18">
         
         {/* Logo and Menu - Left Side */}
         <div className="flex items-center gap-20 h-full">
           {/* Logo */}
-          <div className="flex items-center h-full cursor-pointer" onClick={() => navigate('/')}>
+          <div className="flex items-center h-full cursor-pointer relative right-8" onClick={() => navigate('/')}>
             <span><FontAwesomeIcon icon={faShoppingCart} className='text-2xl px-2'/></span>
             <span className='text-gray-900 text-2xl font-bold'>Quick</span>
             <span className='text-[#007E5D] text-2xl font-bold'>kart</span>
@@ -80,6 +82,20 @@ const navbar2 = () => {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Search Bar - Desktop */}
+        <div className={`${isSmallScreen ? 'hidden' : 'flex'} items-center`}>
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products..."
+              className="pl-10 pr-4 py-2 w-75 rounded-full bg-gray-100 border-none text-sm focus:outline-none focus:ring-2 focus:ring-[#007E5D] focus:bg-white transition-all"
+            />
           </div>
         </div>
 
@@ -139,8 +155,8 @@ const navbar2 = () => {
                 <hr className="my-1" />
                 <button 
                   onClick={() => {
-                    // Add logout logic here
-                    alert('Logout functionality to be implemented');
+                    clearAuthSession();
+                    navigate('/');
                     setProfileDropdownOpen(false);
                   }}
                   className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 text-sm transition-colors">
@@ -168,6 +184,18 @@ const navbar2 = () => {
       {mobileMenuOpen && isSmallScreen && (
         <div className="bg-white border-t border-gray-200">
           <div className="px-6 py-4 space-y-4">
+            {/* Mobile search */}
+            <div className="relative mb-2">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..."
+                className="w-full pl-9 pr-4 py-2.5 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#007E5D]"
+              />
+            </div>
+
             {menuItems.map((item) => (
               <div key={item.label}>
                 <button className="w-full text-left flex items-center justify-between text-gray-700 hover:text-gray-900 py-2 text-sm">
@@ -241,7 +269,8 @@ const navbar2 = () => {
                 </button>
                 <button 
                   onClick={() => {
-                    alert('Logout functionality to be implemented');
+                    clearAuthSession();
+                    navigate('/');
                     setProfileDropdownOpen(false);
                     setMobileMenuOpen(false);
                   }}

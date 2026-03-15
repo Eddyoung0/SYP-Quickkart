@@ -9,19 +9,21 @@ import Login from './pages/authentication/login';
 import Register from './pages/authentication/register';
 import Error404 from './pages/error404page';
 import ForgotPassword from './pages/forgotPassword';
+import AdminDashboard from './pages/adminDashboard/AdminDashboard';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { ThemeContext } from './contexts/ThemeContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useEffect, useState } from 'react';
+import ChatbotWidget from './components/ChatbotWidget';
+import { isLoggedInWithValidSession } from './lib/auth';
 
 const App = () => {
 
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [isLoggedIn, setIsLoggedIn] = useState(() => isLoggedInWithValidSession());
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem('token'));
+    setIsLoggedIn(isLoggedInWithValidSession());
   }, [location.pathname]);
 
   const validPaths = ['/', '/product', '/login', '/register', '/about-us', '/contact','/forgot-password'];
@@ -33,6 +35,7 @@ const App = () => {
     <ThemeProvider>
     <>
     <Toaster/>
+    <ChatbotWidget />
     {!isAdminRoute && !isForm && !wrongURL && (
        isLoggedIn ? <Navbar2/>: <Navbar/>)}
     <Routes>
@@ -42,8 +45,10 @@ const App = () => {
       <Route path='/contact' element={<Contact/>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/register' element={<Register/>}/>
+      <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
       <Route path='/*' element={<Error404/>}/>
       <Route path='/forgot-password' element={<ForgotPassword/>}/>
+      <Route path='/admin' element={<AdminDashboard/>}/>
     </Routes>
     {!isAdminRoute && !isForm && !wrongURL && <Footer/>}
     </>

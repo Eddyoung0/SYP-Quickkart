@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ShoppingCart, Eye, EyeOff } from 'lucide-react'
 import registerSvg from '../../img/authenticationImg/register.png';
 import axios from 'axios';
+import { setAuthSession } from '../../lib/auth';
 
 
 const register = () => {
@@ -23,10 +24,9 @@ const clickRegister = async(e) =>{
     alert(response.data.message);
     
     if(response.data.success){
-      // Store token if returned
+      // Store session with a 3-day expiry if token is returned
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user || {}));
+        setAuthSession(response.data.token, response.data.user || {});
       }
       //redirect to login page
       window.location.href = "/login";
