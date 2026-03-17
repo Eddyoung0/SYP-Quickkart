@@ -9,10 +9,12 @@ dotenv.config();
 const registerUser = async (req, res) =>{
     //Request user data and check missing field
     try{
-        const {name, email, password} = req.body;
+        const {name, email, password, role} = req.body;
         if (!name || !email || !password){
             return res.status(500).json({message: "Please, Fill all the credentials!"})
         }
+
+        const normalizedRole = String(role || 'user').toLowerCase() === 'admin' ? 'admin' : 'user';
 
         //check for the user in DB
         db.query("SELECT * FROM users WHERE email = ?", [email], async(err, result) =>{
@@ -26,7 +28,7 @@ const registerUser = async (req, res) =>{
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, hashedPassword], 
+            db.query("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [name, email, hashedPassword, normalizedRole], 
                 async(err, result) => {
                     if(err){
                         return res.status(500).json({message: "Registration Failed!", error: err})
@@ -94,7 +96,8 @@ const loginUser = async(req, res) =>{
                 user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                role: user.role || 'user'
             }
             })
         })
