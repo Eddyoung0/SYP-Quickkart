@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Trash2 } from 'lucide-react';
 
 const statusOptions = ['processing', 'packed', 'shipped', 'out-for-delivery', 'delivered', 'cancelled'];
 
@@ -32,6 +33,8 @@ const DeliveryTrackingPage = () => {
 
   useEffect(() => {
     fetchOrders();
+    const intervalId = setInterval(fetchOrders, 15000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleFieldChange = (orderId, field, value) => {
@@ -56,6 +59,18 @@ const DeliveryTrackingPage = () => {
       setError(err.response?.data?.message || 'Failed to update delivery status');
     } finally {
       setSavingOrderId(null);
+    }
+  };
+
+  const deleteOrder = async (orderId) => {
+    const shouldDelete = window.confirm('Delete this order record?');
+    if (!shouldDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/orders/${orderId}`);
+      setOrders((prev) => prev.filter((item) => item.id !== orderId));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete order');
     }
   };
 
@@ -123,14 +138,23 @@ const DeliveryTrackingPage = () => {
                       />
                     </td>
                     <td className="py-3.5 px-4 text-sm text-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => saveDeliveryStatus(order)}
-                        disabled={savingOrderId === order.id}
-                        className="rounded-lg bg-[#5B5FEF] px-3 py-2 text-white text-xs font-semibold hover:opacity-90 transition disabled:opacity-60"
-                      >
-                        {savingOrderId === order.id ? 'Saving...' : 'Update'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => saveDeliveryStatus(order)}
+                          disabled={savingOrderId === order.id}
+                          className="rounded-lg bg-[#5B5FEF] px-3 py-2 text-white text-xs font-semibold hover:opacity-90 transition disabled:opacity-60"
+                        >
+                          {savingOrderId === order.id ? 'Saving...' : 'Update'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteOrder(order.id)}
+                          className="rounded-lg border border-red-200 px-3 py-2 text-red-600 text-xs font-semibold hover:bg-red-50 transition inline-flex items-center gap-1"
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

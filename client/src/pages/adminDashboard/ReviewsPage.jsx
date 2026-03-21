@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Plus, X } from 'lucide-react';
+import { Pencil, Plus, Trash2, X } from 'lucide-react';
 
 const initialForm = {
   user_id: '',
@@ -15,6 +15,7 @@ const ReviewsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState(initialForm);
+  const [editingId, setEditingId] = useState(null);
 
   const fetchReviews = async () => {
     try {
@@ -29,11 +30,21 @@ const ReviewsPage = () => {
 
   useEffect(() => {
     fetchReviews();
+    const intervalId = setInterval(fetchReviews, 15000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const openModal = () => {
     setError('');
     setFormData(initialForm);
+    setEditingId(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (review) => {
+    setError('');
+    setEditingId(review.id);
+    setFormData({ user_id: '', product_id: '', comment: review.comment || '' });
     setIsModalOpen(true);
   };
 
@@ -51,14 +62,16 @@ const ReviewsPage = () => {
     e.preventDefault();
     setError('');
 
-    if (!formData.user_id || Number.isNaN(Number(formData.user_id))) {
-      setError('Valid user_id is required');
-      return;
-    }
+    if (!editingId) {
+      if (!formData.user_id || Number.isNaN(Number(formData.user_id))) {
+        setError('Valid user_id is required');
+        return;
+      }
 
-    if (!formData.product_id || Number.isNaN(Number(formData.product_id))) {
-      setError('Valid product_id is required');
-      return;
+      if (!formData.product_id || Number.isNaN(Number(formData.product_id))) {
+        setError('Valid product_id is required');
+        return;
+      }
     }
 
     if (!formData.comment.trim()) {
@@ -68,23 +81,44 @@ const ReviewsPage = () => {
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        user_id: Number(formData.user_id),
-        product_id: Number(formData.product_id),
-        comment: formData.comment,
-      };
+      if (editingId) {
+        const response = await axios.put(`http://localhost:5000/api/reviews/${editingId}`, { comment: formData.comment });
+        const updatedReview = response.data?.data;
+        if (updatedReview) {
+          setReviews((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
+        }
+      } else {
+        const payload = {
+          user_id: Number(formData.user_id),
+          product_id: Number(formData.product_id),
+          comment: formData.comment,
+        };
 
-      const response = await axios.post('http://localhost:5000/api/reviews', payload);
-      const createdReview = response.data?.data;
-      if (createdReview) {
-        setReviews((prev) => [createdReview, ...prev]);
+        const response = await axios.post('http://localhost:5000/api/reviews', payload);
+        const createdReview = response.data?.data;
+        if (createdReview) {
+          setReviews((prev) => [createdReview, ...prev]);
+        }
       }
       setIsModalOpen(false);
       setFormData(initialForm);
+      setEditingId(null);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create review');
+      setError(err.response?.data?.message || `Failed to ${editingId ? 'update' : 'create'} review`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const shouldDelete = window.confirm('Delete this review?');
+    if (!shouldDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/reviews/${id}`);
+      setReviews((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete review');
     }
   };
 
@@ -117,6 +151,7 @@ const ReviewsPage = () => {
                   <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Product</th>
                   <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Comment</th>
                   <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Created</th>
+                  <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -127,6 +162,24 @@ const ReviewsPage = () => {
                     <td className="py-3.5 px-4 text-sm text-gray-700">{review.product_name || '-'}</td>
                     <td className="py-3.5 px-4 text-sm text-gray-700">{review.comment || '-'}</td>
                     <td className="py-3.5 px-4 text-sm text-gray-500">{new Date(review.created_at).toLocaleString()}</td>
+                    <td className="py-3.5 px-4 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEditModal(review)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                        >
+                          <Pencil size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(review.id)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -135,11 +188,13 @@ const ReviewsPage = () => {
         )}
       </div>
 
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/45 flex items-center justify-center p-4">
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.22)] border border-gray-100">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold">Add Review</h2>
+              <h2 className="text-lg font-semibold">{editingId ? 'Edit Review' : 'Add Review'}</h2>
               <button
                 type="button"
                 onClick={closeModal}
@@ -150,7 +205,7 @@ const ReviewsPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {!editingId && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">User ID *</label>
                   <input
@@ -176,7 +231,7 @@ const ReviewsPage = () => {
                     placeholder="e.g. 2"
                   />
                 </div>
-              </div>
+              </div>}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Comment *</label>
@@ -190,7 +245,7 @@ const ReviewsPage = () => {
                 />
               </div>
 
-              <p className="text-xs text-gray-500">Tip: Use existing IDs from Users and Products tables.</p>
+              {!editingId && <p className="text-xs text-gray-500">Tip: Use existing IDs from Users and Products tables.</p>}
 
               {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -207,7 +262,7 @@ const ReviewsPage = () => {
                   disabled={isSubmitting}
                   className="px-4 py-2.5 text-sm font-semibold rounded-lg bg-[#5B5FEF] text-white hover:opacity-90 transition disabled:opacity-60"
                 >
-                  {isSubmitting ? 'Creating...' : 'Create Review'}
+                  {isSubmitting ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create Review')}
                 </button>
               </div>
             </form>

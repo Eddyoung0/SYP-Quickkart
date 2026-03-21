@@ -17,11 +17,10 @@ const Navbar = () => {
   }, []);
 
   const menuItems = [
-    { label: 'Home', link: '/' },
-    { label: 'Products', link: '/product', dropdown: true },
-    { label: 'Deals', link: '/product' },
-    { label: 'Blog', link: '/about-us' },
-    { label: 'Contact', link: '/contact' },
+    { label: 'Home', link: '/login' },
+    { label: 'Products', link: '/login', dropdown: true },
+    { label: 'About Us', link: '/login' },
+    { label: 'Contact', link: '/login' },
   ];
 
   const navigate = useNavigate();

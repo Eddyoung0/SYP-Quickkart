@@ -7,20 +7,15 @@ import CategoriesPage from './CategoriesPage';
 import ReviewsPage from './ReviewsPage';
 import DeliveryTrackingPage from './DeliveryTrackingPage';
 import {
-  ShoppingBag, BoxIcon, Tags, Users,
-  Warehouse, Truck, BarChart3, Star, Settings
+  ShoppingBag, BoxIcon, Tags, Truck, Star
 } from 'lucide-react';
 
 const pageMeta = {
   orders: { label: 'Orders', icon: ShoppingBag },
   products: { label: 'Products', icon: BoxIcon },
   categories: { label: 'Categories', icon: Tags },
-  customers: { label: 'Customers', icon: Users },
-  inventory: { label: 'Inventory', icon: Warehouse },
   delivery: { label: 'Delivery Tracking', icon: Truck },
-  analytics: { label: 'Analytics', icon: BarChart3 },
   reviews: { label: 'Reviews', icon: Star },
-  settings: { label: 'Settings', icon: Settings },
 };
 
 const EmptyPage = ({ pageKey }) => {
@@ -61,11 +56,12 @@ const AdminDashboard = () => {
       <div className="flex-1 flex flex-col md:ml-[260px] min-h-screen">
         <Topbar setSidebarOpen={setSidebarOpen} />
         {activeMenu === 'dashboard' && <DashboardContent />}
+        {activeMenu === 'orders' && <DeliveryTrackingPage />}
         {activeMenu === 'products' && <ProductsPage />}
         {activeMenu === 'categories' && <CategoriesPage />}
         {activeMenu === 'reviews' && <ReviewsPage />}
         {activeMenu === 'delivery' && <DeliveryTrackingPage />}
-        {!['dashboard', 'products', 'categories', 'reviews', 'delivery'].includes(activeMenu) && <EmptyPage pageKey={activeMenu} />}
+        {!['dashboard', 'orders', 'products', 'categories', 'reviews', 'delivery'].includes(activeMenu) && <EmptyPage pageKey={activeMenu} />}
       </div>
     </div>
   );

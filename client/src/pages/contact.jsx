@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Globe, ChevronDown } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, Clock, ChevronDown, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import img from '../img/gridlayout.png';
 
 // Helper function to check if element is in viewport
@@ -188,6 +188,13 @@ const Contact = () => {
     },
   ];
 
+  const socialLinks = [
+    { name: 'Facebook', href: 'https://www.facebook.com/quickkart', icon: Facebook},
+    { name: 'Twitter', href: 'https://twitter.com/', icon: Twitter },
+    { name: 'Instagram', href: 'https://instagram.com/quickkart', icon: Instagram },
+    { name: 'LinkedIn', href: 'https://linkedin.com/', icon: Linkedin },
+  ];
+
   return (
     <div className="bg-[#f8f9fa] flex flex-col pt-16">
       {/* Hero Section */}
@@ -367,15 +374,19 @@ const Contact = () => {
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-3">Follow Us</h4>
                   <div className="flex gap-3">
-                    {['Facebook', 'Twitter', 'Instagram', 'LinkedIn'].map((social) => (
+                    {socialLinks.map((social) => {
+                      const Icon = social.icon;
+                      return (
                       <a
-                        key={social}
-                        href="#"
+                        key={social.name}
+                        href={social.href}
+                        aria-label={social.name}
                         className="w-10 h-10 bg-green-100 text-[#007E5D] rounded-full flex items-center justify-center hover:bg-[#007E5D] hover:text-white transition-all duration-200"
                       >
-                        <Globe size={18} />
+                        <Icon size={18} />
                       </a>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -402,7 +413,7 @@ const Contact = () => {
                   <h3 className="text-lg font-semibold text-gray-800 text-left">{faq.question}</h3>
                   <ChevronDown
                     size={24}
-                    className={`text-[#007E5D] flex-shrink-0 transition-transform duration-300 ${
+                    className={`text-[#007E5D] shrink-0 transition-transform duration-300 ${
                       expandedFAQ === idx ? 'rotate-180' : ''
                     }`}
                   />

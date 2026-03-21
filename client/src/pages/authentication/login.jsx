@@ -33,9 +33,13 @@ const login = () => {
           await hydrateCartFromBackend();
         }
 
+        const redirectPath = String(response.data?.user?.role || '').toLowerCase() === 'admin'
+          ? '/admin/dashboard'
+          : '/';
+
         setTimeout(() => {
           setShowAlert(false);
-          window.location.href = '/';
+          window.location.href = redirectPath;
         }, 1000);
       }
     } catch (error) {

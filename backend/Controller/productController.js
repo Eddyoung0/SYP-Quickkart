@@ -156,4 +156,107 @@ const createProduct = (req, res) => {
   );
 };
 
-export { getProducts, createProduct, getProductById };
+const updateProduct = (req, res) => {
+  const productId = Number(req.params.id);
+  if (!productId || Number.isNaN(productId)) {
+    return res.status(400).json({ message: 'Valid product id is required' });
+  }
+
+  const {
+    department,
+    name,
+    price,
+    oldPrice,
+    rating,
+    reviews,
+    color,
+    image,
+    images,
+    description,
+  } = req.body;
+
+  const validDepartments = ['electronics', 'groceries', 'clothing', 'home-kitchen'];
+  if (!department || !validDepartments.includes(department)) {
+    return res.status(400).json({ message: 'Department must be electronics, groceries, clothing, or home-kitchen' });
+  }
+
+  if (!name || price === undefined || price === null || Number.isNaN(Number(price))) {
+    return res.status(400).json({ message: 'Name and valid price are required' });
+  }
+
+  if (!image || !String(image).trim()) {
+    return res.status(400).json({ message: 'Image URL is required' });
+  }
+
+  const normalizedDescription = description?.trim() || null;
+  const normalizedImages = Array.isArray(images)
+    ? images.filter((url) => typeof url === 'string' && url.trim()).map((url) => url.trim())
+    : [];
+
+  const payload = [
+    department,
+    name.trim(),
+    Number(price),
+    oldPrice === undefined || oldPrice === null || oldPrice === '' ? null : Number(oldPrice),
+    rating === undefined || rating === null || rating === '' ? 0 : Number(rating),
+    reviews === undefined || reviews === null || reviews === '' ? 0 : Number(reviews),
+    color?.trim() || null,
+    String(image).trim(),
+    normalizedImages.length ? JSON.stringify(normalizedImages) : null,
+    normalizedDescription,
+    productId,
+  ];
+
+  db.query(
+    `UPDATE products
+      SET department = ?,
+          name = ?,
+          price = ?,
+          old_price = ?,
+          rating = ?,
+          reviews_count = ?,
+          color = ?,
+          image_url = ?,
+          images_json = ?,
+          description = ?
+      WHERE id = ?`,
+    payload,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: 'Failed to update product', error: err.message });
+      }
+
+      if (!result.affectedRows) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+
+      db.query(`${PRODUCT_SELECT} WHERE id = ?`, [productId], (fetchErr, rows) => {
+        if (fetchErr) {
+          return res.status(500).json({ message: 'Product updated, but failed to fetch updated record', error: fetchErr.message });
+        }
+        return res.status(200).json({ success: true, message: 'Product updated successfully', data: mapProductRow(rows[0]) });
+      });
+    }
+  );
+};
+
+const deleteProduct = (req, res) => {
+  const productId = Number(req.params.id);
+  if (!productId || Number.isNaN(productId)) {
+    return res.status(400).json({ message: 'Valid product id is required' });
+  }
+
+  db.query('DELETE FROM products WHERE id = ?', [productId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to delete product', error: err.message });
+    }
+
+    if (!result.affectedRows) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Product deleted successfully' });
+  });
+};
+
+export { getProducts, createProduct, getProductById, updateProduct, deleteProduct };

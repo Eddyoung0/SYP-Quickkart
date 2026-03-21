@@ -11,7 +11,6 @@ const register = () => {
   const[name, setName] = useState("");
   const[email, setEmail] = useState("");
   const[password, setPassword] = useState("");
-  const[role, setRole] = useState('user');
 
 const clickRegister = async(e) =>{
   e.preventDefault(); // Prevent form refresh
@@ -21,7 +20,6 @@ const clickRegister = async(e) =>{
       name,
       email,
       password,
-      role,
     });
     alert(response.data.message);
     
@@ -114,21 +112,6 @@ const clickRegister = async(e) =>{
                   )}
                 </button>
               </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-600 text-sm mb-2" htmlFor="role">
-                Role
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#007E5D] focus:border-transparent"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
             </div>
 
             <div className="text-left mb-5 gap-2 flex items-center">

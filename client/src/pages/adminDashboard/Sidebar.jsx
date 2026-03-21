@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  LayoutDashboard, ShoppingBag, BoxIcon, Tags, Users,
-  Warehouse, Truck, BarChart3, Star, Settings, Rocket, X, Zap
+  LayoutDashboard, ShoppingBag, BoxIcon, Tags,
+  Truck, Star, X, Zap
 } from 'lucide-react';
 
 const menuItems = [
@@ -9,12 +9,8 @@ const menuItems = [
   { icon: ShoppingBag, label: 'Orders', key: 'orders' },
   { icon: BoxIcon, label: 'Products', key: 'products' },
   { icon: Tags, label: 'Categories', key: 'categories' },
-  { icon: Users, label: 'Customers', key: 'customers' },
-  { icon: Warehouse, label: 'Inventory', key: 'inventory' },
   { icon: Truck, label: 'Delivery Tracking', key: 'delivery' },
-  { icon: BarChart3, label: 'Analytics', key: 'analytics' },
   { icon: Star, label: 'Reviews', key: 'reviews' },
-  { icon: Settings, label: 'Settings', key: 'settings' },
 ];
 
 const Sidebar = ({ activeMenu, setActiveMenu, sidebarOpen, setSidebarOpen }) => {

@@ -245,4 +245,116 @@ const updateDeliveryStatus = async (req, res) => {
   }
 };
 
-export { checkoutOrders, getUserOrders, getAllOrders, updateDeliveryStatus, VALID_DELIVERY_STATUSES };
+const getDashboardOverview = async (req, res) => {
+  try {
+    const [ordersCountRow] = await queryAsync('SELECT COUNT(*) AS total_orders FROM orders');
+    const [revenueRow] = await queryAsync("SELECT COALESCE(SUM(total_price), 0) AS total_revenue FROM orders WHERE payment_status = 'paid'");
+    const [customersRow] = await queryAsync("SELECT COUNT(*) AS total_customers FROM users WHERE role = 'user'");
+    const [productsRow] = await queryAsync('SELECT COUNT(*) AS total_products FROM products');
+    const [pendingDeliveryRow] = await queryAsync("SELECT COUNT(*) AS pending_deliveries FROM orders WHERE delivery_status IN ('processing', 'packed', 'shipped', 'out-for-delivery')");
+    const [todayOrdersRow] = await queryAsync('SELECT COUNT(*) AS today_orders FROM orders WHERE DATE(created_at) = CURDATE()');
+
+    const salesSeries = await queryAsync(
+      `SELECT
+        DATE(created_at) AS day,
+        COUNT(*) AS orders,
+        COALESCE(SUM(total_price), 0) AS revenue
+      FROM orders
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+      GROUP BY DATE(created_at)
+      ORDER BY day ASC`
+    );
+
+    const topDepartments = await queryAsync(
+      `SELECT
+        p.department,
+        COUNT(o.id) AS orders,
+        COALESCE(SUM(o.total_price), 0) AS revenue
+      FROM orders o
+      INNER JOIN products p ON p.id = o.product_id
+      GROUP BY p.department
+      ORDER BY orders DESC, revenue DESC
+      LIMIT 5`
+    );
+
+    const recentOrders = await queryAsync(
+      `SELECT
+        o.id,
+        u.name AS customer,
+        p.name AS product,
+        o.quantity,
+        o.total_price,
+        o.delivery_status,
+        o.created_at
+      FROM orders o
+      INNER JOIN users u ON u.id = o.user_id
+      INNER JOIN products p ON p.id = o.product_id
+      ORDER BY o.created_at DESC
+      LIMIT 8`
+    );
+
+    const deliveryQueue = await queryAsync(
+      `SELECT
+        o.id,
+        u.name,
+        p.name AS product_name,
+        o.delivery_status,
+        o.tracking_note,
+        o.updated_at
+      FROM orders o
+      INNER JOIN users u ON u.id = o.user_id
+      INNER JOIN products p ON p.id = o.product_id
+      WHERE o.delivery_status IN ('processing', 'packed', 'shipped', 'out-for-delivery')
+      ORDER BY o.updated_at DESC
+      LIMIT 8`
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        kpis: {
+          totalOrders: Number(ordersCountRow?.total_orders || 0),
+          totalRevenue: Number(revenueRow?.total_revenue || 0),
+          totalCustomers: Number(customersRow?.total_customers || 0),
+          totalProducts: Number(productsRow?.total_products || 0),
+          pendingDeliveries: Number(pendingDeliveryRow?.pending_deliveries || 0),
+          todayOrders: Number(todayOrdersRow?.today_orders || 0),
+        },
+        salesSeries,
+        topDepartments,
+        recentOrders,
+        deliveryQueue,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch dashboard overview', error: err.message });
+  }
+};
+
+const deleteOrder = async (req, res) => {
+  try {
+    const orderId = Number(req.params.orderId);
+    if (!orderId || Number.isNaN(orderId)) {
+      return res.status(400).json({ message: 'Valid order id is required' });
+    }
+
+    const result = await queryAsync('DELETE FROM orders WHERE id = ?', [orderId]);
+    if (!result.affectedRows) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Order deleted successfully' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to delete order', error: err.message });
+  }
+};
+
+export {
+  checkoutOrders,
+  getUserOrders,
+  getAllOrders,
+  updateDeliveryStatus,
+  getDashboardOverview,
+  deleteOrder,
+  VALID_DELIVERY_STATUSES,
+};

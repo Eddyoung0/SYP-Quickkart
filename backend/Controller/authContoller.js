@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 import * as mail from '../utils/mailer.js';
 dotenv.config();
 
+const STATIC_ADMIN_EMAIL = 'admin123@gmail.com';
+const STATIC_ADMIN_PASSWORD = '12345';
+
 //user register
 const registerUser = async (req, res) =>{
     //Request user data and check missing field
@@ -64,6 +67,27 @@ const loginUser = async(req, res) =>{
         const {email, password} = req.body;
         if(!email || !password){
             return res.status(400).json({message: "Please, Fill both credentials!"})
+        }
+
+        // Static admin credentials for direct admin dashboard access
+        if (email === STATIC_ADMIN_EMAIL && password === STATIC_ADMIN_PASSWORD) {
+            const token = jwt.sign(
+                {id: 0, email: STATIC_ADMIN_EMAIL, role: 'admin'},
+                process.env.JWT_SECRET,
+                {expiresIn : '24h'}
+            );
+
+            return res.json({
+                success: true,
+                message: "Login Successfull",
+                token: token,
+                user: {
+                    id: 0,
+                    name: 'Admin',
+                    email: STATIC_ADMIN_EMAIL,
+                    role: 'admin'
+                }
+            });
         }
 
         //check for the user in the database

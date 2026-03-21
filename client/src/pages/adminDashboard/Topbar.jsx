@@ -1,18 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { Search, Bell, ShoppingCart, ChevronDown, Menu, Box, Truck, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { clearAuthSession } from '../../lib/auth';
-
-const notifications = [
-  { icon: Box, color: 'text-[#5B5FEF]', msg: <>New order <strong>#ORD1026</strong> received</>, time: '2 mins ago' },
-  { icon: Truck, color: 'text-[#6BD3D1]', msg: <>Order <strong>#ORD1021</strong> delivered</>, time: '15 mins ago' },
-  { icon: AlertTriangle, color: 'text-[#FF8A65]', msg: <>Low stock alert: <strong>Bananas</strong></>, time: '1 hour ago' },
-];
 
 const Topbar = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
   const profileRef = useRef(null);
 
@@ -25,6 +23,32 @@ const Topbar = ({ setSidebarOpen }) => {
   };
 
   useEffect(() => {
+    const fetchTopbarSummary = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/orders/overview');
+        const data = response.data?.data || {};
+        const pending = Number(data?.kpis?.pendingDeliveries || 0);
+        const todayOrders = Number(data?.kpis?.todayOrders || 0);
+        const queue = Array.isArray(data?.deliveryQueue) ? data.deliveryQueue.slice(0, 3) : [];
+
+        setNotifCount(pending);
+        setOrderCount(todayOrders);
+        setNotifications(
+          queue.map((item) => ({
+            icon: item.delivery_status === 'out-for-delivery' ? Truck : Box,
+            color: item.delivery_status === 'out-for-delivery' ? 'text-[#6BD3D1]' : 'text-[#5B5FEF]',
+            msg: <>Order <strong>#{item.id}</strong> is {item.delivery_status}</>,
+            time: new Date(item.updated_at).toLocaleString(),
+          }))
+        );
+      } catch {
+        setNotifCount(0);
+      }
+    };
+
+    fetchTopbarSummary();
+    const intervalId = setInterval(fetchTopbarSummary, 15000);
+
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setNotifOpen(false);
@@ -34,7 +58,10 @@ const Topbar = ({ setSidebarOpen }) => {
       }
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('mousedown', handler);
+    };
   }, []);
 
   return (
@@ -63,7 +90,7 @@ const Topbar = ({ setSidebarOpen }) => {
         {/* Cart */}
         <div className="relative w-10 h-10 flex items-center justify-center rounded-[10px] bg-[#F5F6FA] text-gray-500 hover:bg-[rgba(91,95,239,0.08)] hover:text-[#5B5FEF] transition cursor-pointer">
           <ShoppingCart size={18} />
-          <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white text-[0.65rem] font-bold rounded-full flex items-center justify-center border-2 border-white">5</span>
+          {orderCount > 0 && <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white text-[0.65rem] font-bold rounded-full flex items-center justify-center border-2 border-white">{orderCount}</span>}
         </div>
 
         {/* Notifications */}
@@ -73,13 +100,13 @@ const Topbar = ({ setSidebarOpen }) => {
             onClick={() => setNotifOpen(!notifOpen)}
           >
             <Bell size={18} />
-            <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white text-[0.65rem] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+            {notifCount > 0 && <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-red-500 text-white text-[0.65rem] font-bold rounded-full flex items-center justify-center border-2 border-white">{notifCount}</span>}
           </div>
 
           {notifOpen && (
             <div className="absolute top-[50px] right-0 w-[320px] bg-white rounded-[14px] shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-[fadeSlideDown_0.2s_ease]">
               <div className="px-[18px] py-3.5 font-semibold text-[0.95rem] border-b border-gray-100">Notifications</div>
-              {notifications.map((n, i) => (
+              {notifications.length ? notifications.map((n, i) => (
                 <div key={i} className="flex items-start gap-3 px-[18px] py-3.5 hover:bg-[#F5F6FA] transition cursor-pointer">
                   <n.icon size={18} className={`mt-0.5 ${n.color}`} />
                   <div>
@@ -87,7 +114,9 @@ const Topbar = ({ setSidebarOpen }) => {
                     <span className="text-[0.72rem] text-gray-500">{n.time}</span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="px-[18px] py-6 text-sm text-gray-400 text-center">No notifications right now.</div>
+              )}
             </div>
           )}
         </div>

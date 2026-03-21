@@ -4,6 +4,8 @@ const getReviews = (req, res) => {
   const query = `
     SELECT
       c.id,
+      c.user_id,
+      c.product_id,
       c.comment,
       c.created_at,
       COALESCE(u.name, 'Anonymous') AS user_name,
@@ -12,7 +14,6 @@ const getReviews = (req, res) => {
     LEFT JOIN users u ON c.user_id = u.id
     LEFT JOIN products p ON c.product_id = p.id
     ORDER BY c.created_at DESC
-    LIMIT 12
   `;
 
   db.query(query, (err, results) => {
@@ -95,4 +96,66 @@ const createReview = (req, res) => {
   });
 };
 
-export { getReviews, createReview };
+const updateReview = (req, res) => {
+  const reviewId = Number(req.params.id);
+  const { comment } = req.body;
+
+  if (!reviewId || Number.isNaN(reviewId)) {
+    return res.status(400).json({ message: 'Valid review id is required' });
+  }
+
+  if (!comment || !comment.trim()) {
+    return res.status(400).json({ message: 'Comment is required' });
+  }
+
+  db.query('UPDATE comments SET comment = ? WHERE id = ?', [comment.trim(), reviewId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to update review', error: err.message });
+    }
+
+    if (!result.affectedRows) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    const query = `
+      SELECT
+        c.id,
+        c.comment,
+        c.created_at,
+        COALESCE(u.name, 'Anonymous') AS user_name,
+        COALESCE(p.name, 'Product') AS product_name
+      FROM comments c
+      LEFT JOIN users u ON c.user_id = u.id
+      LEFT JOIN products p ON c.product_id = p.id
+      WHERE c.id = ?
+    `;
+
+    db.query(query, [reviewId], (fetchErr, rows) => {
+      if (fetchErr) {
+        return res.status(500).json({ message: 'Review updated, but failed to fetch updated record', error: fetchErr.message });
+      }
+      return res.status(200).json({ success: true, message: 'Review updated successfully', data: rows[0] });
+    });
+  });
+};
+
+const deleteReview = (req, res) => {
+  const reviewId = Number(req.params.id);
+  if (!reviewId || Number.isNaN(reviewId)) {
+    return res.status(400).json({ message: 'Valid review id is required' });
+  }
+
+  db.query('DELETE FROM comments WHERE id = ?', [reviewId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to delete review', error: err.message });
+    }
+
+    if (!result.affectedRows) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Review deleted successfully' });
+  });
+};
+
+export { getReviews, createReview, updateReview, deleteReview };

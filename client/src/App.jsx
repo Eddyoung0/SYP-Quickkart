@@ -2,6 +2,7 @@ import Navbar from './components/navbar';
 import Navbar2 from './components/navbar2';
 import Footer from './components/footer';
 import Home from './pages/home';
+import PreviewPage from './pages/previewpage';
 import Product from './pages/product';
 import Electronics from './pages/electronics';
 import Groceries from './pages/groceries';
@@ -57,7 +58,7 @@ const App = () => {
     hydrateCartFromBackend();
   }, [isLoggedIn]);
 
-  const publicPaths = ['/', '/product', '/product/electronics', '/product/groceries', '/product/home-kitchen', '/help', '/login', '/register', '/about-us', '/contact', '/forgot-password'];
+  const publicPaths = ['/', '/previewpage', '/product', '/product/electronics', '/product/groceries', '/product/home-kitchen', '/help', '/login', '/register', '/about-us', '/contact', '/forgot-password'];
   const authOnlyPaths = ['/favourite', '/cart', '/payment', '/payment/success', '/profile', '/orders'];
   const adminOnlyPaths = ['/admin', '/admin/dashboard'];
 
@@ -110,7 +111,8 @@ const App = () => {
     {!isAdminRoute && !isForm && !wrongURL && (
        isLoggedIn ? <Navbar2/>: <Navbar/>)}
     <Routes>
-      <Route path='/' element={<Home/>}/>
+      <Route path='/' element={isLoggedIn ? <Home/> : <PreviewPage/>}/>
+      <Route path='/previewpage' element={<PreviewPage/>}/>
       <Route path='/product' element={<Product/>}/>
       <Route path='/product/electronics' element={<Electronics/>}/>
       <Route path='/product/groceries' element={<Groceries/>}/>

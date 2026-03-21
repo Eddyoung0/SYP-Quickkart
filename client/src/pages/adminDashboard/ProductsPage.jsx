@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Plus, X } from 'lucide-react';
+import { Pencil, Plus, Trash2, X } from 'lucide-react';
 
 const initialForm = {
   department: 'clothing',
@@ -22,6 +22,7 @@ const ProductsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState(initialForm);
+  const [editingId, setEditingId] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -36,11 +37,32 @@ const ProductsPage = () => {
 
   useEffect(() => {
     fetchProducts();
+    const intervalId = setInterval(fetchProducts, 15000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const openModal = () => {
     setError('');
     setFormData(initialForm);
+    setEditingId(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
+    setError('');
+    setEditingId(product.id);
+    setFormData({
+      department: product.department || 'clothing',
+      name: product.name || '',
+      price: product.price ?? '',
+      oldPrice: product.oldPrice ?? '',
+      rating: product.rating ?? '',
+      reviews: product.reviews ?? '',
+      color: product.color || '',
+      image: product.image || '',
+      images: Array.isArray(product.images) ? product.images.join(', ') : '',
+      description: product.description || '',
+    });
     setIsModalOpen(true);
   };
 
@@ -90,17 +112,39 @@ const ProductsPage = () => {
           .filter(Boolean),
         description: formData.description,
       };
-      const response = await axios.post('http://localhost:5000/api/products', payload);
-      const createdProduct = response.data?.data;
-      if (createdProduct) {
-        setProducts((prev) => [createdProduct, ...prev]);
+      if (editingId) {
+        const response = await axios.put(`http://localhost:5000/api/products/${editingId}`, payload);
+        const updatedProduct = response.data?.data;
+        if (updatedProduct) {
+          setProducts((prev) => prev.map((item) => (item.id === updatedProduct.id ? updatedProduct : item)));
+        }
+      } else {
+        const response = await axios.post('http://localhost:5000/api/products', payload);
+        const createdProduct = response.data?.data;
+        if (createdProduct) {
+          setProducts((prev) => [createdProduct, ...prev]);
+        }
       }
+
       setIsModalOpen(false);
       setFormData(initialForm);
+      setEditingId(null);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create product');
+      setError(err.response?.data?.message || `Failed to ${editingId ? 'update' : 'create'} product`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const shouldDelete = window.confirm('Delete this product? This action cannot be undone.');
+    if (!shouldDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      setProducts((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete product');
     }
   };
 
@@ -136,6 +180,7 @@ const ProductsPage = () => {
                   <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Reviews</th>
                   <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Description</th>
                   <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Created</th>
+                  <th className="text-left text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider py-3 px-4">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -149,6 +194,24 @@ const ProductsPage = () => {
                     <td className="py-3.5 px-4 text-sm text-gray-700">{product.reviews || 0}</td>
                     <td className="py-3.5 px-4 text-sm text-gray-700">{product.description || '-'}</td>
                     <td className="py-3.5 px-4 text-sm text-gray-500">{new Date(product.created_at).toLocaleString()}</td>
+                    <td className="py-3.5 px-4 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEditModal(product)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                        >
+                          <Pencil size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(product.id)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -157,11 +220,13 @@ const ProductsPage = () => {
         )}
       </div>
 
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/45 flex items-center justify-center p-4">
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.22)] border border-gray-100">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold">Add Product</h2>
+              <h2 className="text-lg font-semibold">{editingId ? 'Edit Product' : 'Add Product'}</h2>
               <button
                 type="button"
                 onClick={closeModal}
@@ -318,7 +383,7 @@ const ProductsPage = () => {
                   disabled={isSubmitting}
                   className="px-4 py-2.5 text-sm font-semibold rounded-lg bg-[#5B5FEF] text-white hover:opacity-90 transition disabled:opacity-60"
                 >
-                  {isSubmitting ? 'Creating...' : 'Create Product'}
+                  {isSubmitting ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create Product')}
                 </button>
               </div>
             </form>
