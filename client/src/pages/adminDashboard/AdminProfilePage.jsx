@@ -1,4 +1,4 @@
-cimport React from 'react';
+import React from 'react';
 import { Mail, ShieldCheck, UserCircle2, BadgeCheck } from 'lucide-react';
 import { getAuthUser } from '../../lib/auth';
 
