@@ -130,7 +130,7 @@ const ProductDetails = () => {
             <div>
               <h1 className="text-3xl font-semibold text-gray-800">{product.name}</h1>
               <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                <div className="flex items-center text-amber-500">
+                <div className="flex items-center text-[#007E5D]">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={16} className={i < Math.floor(product.rating) ? 'fill-current' : ''} />
                   ))}
@@ -242,7 +242,7 @@ const ProductDetails = () => {
                   <div key={review.id} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold text-gray-800">{review.name}</h3>
-                      <div className="flex items-center text-amber-500">
+                      <div className="flex items-center text-[#007E5D]">
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} size={14} className={i < review.rating ? 'fill-current' : ''} />
                         ))}

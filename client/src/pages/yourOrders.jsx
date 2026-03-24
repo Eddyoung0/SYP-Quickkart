@@ -10,7 +10,7 @@ const YourOrders = () => {
   const [loading, setLoading] = useState(true);
 
   const statusClasses = {
-    processing: 'bg-amber-100 text-amber-700',
+    processing: 'bg-[#EAF7F3] text-[#016B4F]',
     packed: 'bg-purple-100 text-purple-700',
     shipped: 'bg-blue-100 text-blue-700',
     'out-for-delivery': 'bg-sky-100 text-sky-700',

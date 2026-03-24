@@ -213,10 +213,19 @@ const navbar2 = () => {
       {/* Mobile Menu */}
       {mobileMenuOpen && isSmallScreen && (
         <div className="bg-white border-t border-gray-200">
-          <div className="px-6 py-4 space-y-4">
+          <div className="px-6 py-4 space-y-4 profile-dropdown">
             {menuItems.map((item) => (
               <div key={item.label}>
-                <button className="w-full text-left flex items-center justify-between text-gray-700 hover:text-gray-900 py-2 text-sm">
+                <button
+                  className="w-full text-left flex items-center justify-between text-gray-700 hover:text-gray-900 py-2 text-sm"
+                  onClick={() => {
+                    if (!item.dropdown) {
+                      navigate(item.link);
+                      setProfileDropdownOpen(false);
+                      setMobileMenuOpen(false);
+                    }
+                  }}
+                >
                   {item.label}
                   {item.dropdown && <ChevronDown size={16} />}
                 </button>
@@ -240,21 +249,38 @@ const navbar2 = () => {
             ))}
             
             {/* Mobile Action Buttons */}
-            <div className="border-t border-gray-200 pt-4 space-y-3 flex gap-4">
-              <button className="flex-1 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] py-2 text-sm font-medium transition-colors"
-              onClick={() => navigate('/favourite')}>
+            <div className="border-t border-gray-200 pt-4 grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                className="min-h-11 rounded-lg border border-gray-200 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] hover:border-[#007E5D] text-sm font-medium transition-colors"
+                onClick={() => {
+                  navigate('/favourite');
+                  setProfileDropdownOpen(false);
+                  setMobileMenuOpen(false);
+                }}
+              >
                 <Heart size={20} />
-                <span>Favourite {favouriteCount > 0 ? `(${favouriteCount})` : ''}</span>
+                <span className="leading-none">Favourite {favouriteCount > 0 ? `(${favouriteCount})` : ''}</span>
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] py-2 text-sm font-medium transition-colors"
-              onClick={() => navigate('/cart')}>
+              <button
+                type="button"
+                className="min-h-11 rounded-lg border border-gray-200 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] hover:border-[#007E5D] text-sm font-medium transition-colors"
+                onClick={() => {
+                  navigate('/cart');
+                  setProfileDropdownOpen(false);
+                  setMobileMenuOpen(false);
+                }}
+              >
                 <ShoppingCart size={20} />
-                <span>Cart {cartCount > 0 ? `(${cartCount})` : ''}</span>
+                <span className="leading-none">Cart {cartCount > 0 ? `(${cartCount})` : ''}</span>
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] py-2 text-sm font-medium transition-colors"
-              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}>
+              <button
+                type="button"
+                className="min-h-11 rounded-lg border border-gray-200 flex items-center justify-center gap-2 text-gray-700 hover:text-[#007E5D] hover:border-[#007E5D] text-sm font-medium transition-colors"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              >
                 <User size={20} />
-                <span>Profile</span>
+                <span className="leading-none">Profile</span>
               </button>
             </div>
 

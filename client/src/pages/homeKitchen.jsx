@@ -226,7 +226,7 @@ const HomeKitchen = () => {
                       <h3 className="mt-1 text-base font-semibold text-neutral-900 cursor-pointer hover:underline" onClick={() => openProduct(item.id)}>
                         {item.name}
                       </h3>
-                      <div className="mt-2 flex items-center gap-1.5 text-amber-500">
+                      <div className="mt-2 flex items-center gap-1.5 text-[#007E5D]">
                         <Star size={15} className="fill-current" />
                         <span className="text-sm font-medium text-neutral-700">{item.rating}</span>
                         <span className="text-sm text-neutral-500">({item.reviews})</span>

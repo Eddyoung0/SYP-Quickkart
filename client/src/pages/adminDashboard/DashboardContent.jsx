@@ -8,7 +8,7 @@ const kpiCardStyles = [
   { icon: ShoppingBag, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
   { icon: DollarSign, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
   { icon: Users, iconBg: 'bg-cyan-50', iconColor: 'text-cyan-600' },
-  { icon: Box, iconBg: 'bg-orange-50', iconColor: 'text-orange-600' },
+  { icon: Box, iconBg: 'bg-[#EAF7F3]', iconColor: 'text-[#007E5D]' },
 ];
 
 const DashboardContent = () => {

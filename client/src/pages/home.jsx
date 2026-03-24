@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { Heart, Star, ShoppingCart, Package, ArrowRight } from "lucide-react";
+import { Heart, Star, Package, ArrowRight } from "lucide-react";
 import HomeReviewsSection from "../components/HomeReviewsSection";
 import { fetchProducts } from '../lib/productsApi';
 
@@ -45,10 +45,10 @@ const Home = () => {
   ];
 
   const categoryStrip = [
-    { name: "Vacuum cleaners", label: "Big Sale 25%" },
-    { name: "Xbox & Consoles", label: "Big Sale 30%" },
-    { name: "Portable speakers", label: "" },
-    { name: "Projectors", label: "" },
+    { name: "Vacuum cleaners", label: "Big Sale 25%", icon: "🧹" },
+    { name: "Xbox & Consoles", label: "Big Sale 30%", icon: "🎮" },
+    { name: "Portable speakers", label: "", icon: "🔊" },
+    { name: "Projectors", label: "", icon: "📽️" },
   ];
 
   useEffect(() => {
@@ -150,7 +150,7 @@ const Home = () => {
               size={12}
               className={
                 i < Math.floor(product.rating)
-                  ? "fill-amber-400 text-amber-400"
+                  ? "fill-[#007E5D] text-[#007E5D]"
                   : "text-gray-200 fill-gray-200"
               }
             />
@@ -198,7 +198,7 @@ const Home = () => {
 
             <div className="relative flex justify-center animate-fade-in">
               <div className="relative">
-                <div className="absolute -top-2 right-4 lg:right-8 bg-amber-400 text-white font-bold text-lg w-16 h-16 rounded-full flex items-center justify-center z-10 shadow-lg">
+                <div className="absolute -top-2 right-4 lg:right-8 bg-[#007E5D] text-white font-bold text-lg w-16 h-16 rounded-full flex items-center justify-center z-10 shadow-lg">
                   50%
                 </div>
                 <img
@@ -269,7 +269,7 @@ const Home = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 </div>
-                <h3 className="text-sm font-medium text-gray-800 group-hover:text-amber-600 transition-colors text-center">
+                <h3 className="text-sm font-medium text-gray-800 group-hover:text-[#007E5D] transition-colors text-center">
                   {cat.name}
                 </h3>
               </div>
@@ -291,7 +291,7 @@ const Home = () => {
                   Shop Trendy Deals, Lightning Deals,
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">and best low-price discounts.</p>
-                <span className="text-sm font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1 cursor-pointer">
+                <span className="text-sm font-medium text-[#007E5D] hover:text-[#016B4F] flex items-center gap-1 cursor-pointer">
                   See more <ArrowRight size={14} />
                 </span>
               </div>
@@ -310,7 +310,7 @@ const Home = () => {
                   Best Deals Finder, Lightning Deals and
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">limited-time discounts.</p>
-                <span className="text-sm font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1 cursor-pointer">
+                <span className="text-sm font-medium text-[#007E5D] hover:text-[#016B4F] flex items-center gap-1 cursor-pointer">
                   See more <ArrowRight size={14} />
                 </span>
               </div>
@@ -343,7 +343,7 @@ const Home = () => {
               </button>
             </div>
             <div className="flex-shrink-0">
-              <Package size={100} className="text-amber-400 md:w-[120px] md:h-[120px]" strokeWidth={1} />
+              <Package size={100} className="text-[#007E5D] md:w-[120px] md:h-[120px]" strokeWidth={1} />
             </div>
           </div>
         </div>
@@ -413,7 +413,7 @@ const Home = () => {
                   <p className="text-sm text-gray-500 mb-4">
                     Shop Quickkart Fashion including clothing, shoes, jewelry, watches, bags and more.
                   </p>
-                  <span className="text-sm font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1 cursor-pointer">
+                  <span className="text-sm font-medium text-[#007E5D] hover:text-[#016B4F] flex items-center gap-1 cursor-pointer">
                     See more <ArrowRight size={14} />
                   </span>
                   <div className="mt-4 flex items-center gap-3">
@@ -438,7 +438,7 @@ const Home = () => {
                   <p className="text-sm text-gray-500 mb-4">
                     Shop Quickkart Fashion including clothing, shoes, jewelry, watches, bags and more.
                   </p>
-                  <span className="text-sm font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1 cursor-pointer">
+                  <span className="text-sm font-medium text-[#007E5D] hover:text-[#016B4F] flex items-center gap-1 cursor-pointer">
                     See more <ArrowRight size={14} />
                   </span>
                   <div className="mt-4 flex items-center gap-3">
@@ -459,10 +459,10 @@ const Home = () => {
             {categoryStrip.map((cat, i) => (
               <div key={i} className="flex items-center gap-3 cursor-pointer group">
                 <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center group-hover:shadow transition-shadow">
-                  <ShoppingCart size={20} className="text-gray-400" />
+                  <span className="text-xl leading-none">{cat.icon}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-800 group-hover:text-amber-600 transition-colors">
+                  <p className="text-sm font-medium text-gray-800 group-hover:text-[#007E5D] transition-colors">
                     {cat.name}
                   </p>
                   {cat.label && <p className="text-xs text-gray-400">{cat.label}</p>}

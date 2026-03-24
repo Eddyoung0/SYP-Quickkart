@@ -284,7 +284,7 @@ export const aboutUs = () => {
               <div
                 ref={visionRef}
                 style={visionScale}
-                className="bg-white border-l-4 border-orange-500 p-8 rounded-lg shadow-md"
+                className="bg-white border-l-4 border-[#007E5D] p-8 rounded-lg shadow-md"
               >
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   Our Vision

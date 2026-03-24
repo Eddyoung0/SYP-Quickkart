@@ -81,7 +81,7 @@ const ProductGrid = ({ products, likedProducts, onToggleLike, onAddToCart }) => 
                 )}
               </div>
               {product.stock && (
-                <span className={`text-xs font-semibold ${product.stock > 10 ? 'text-green-600' : 'text-orange-600'}`}>
+                <span className={`text-xs font-semibold ${product.stock > 10 ? 'text-green-600' : 'text-[#007E5D]'}`}>
                   {product.stock} in stock
                 </span>
               )}

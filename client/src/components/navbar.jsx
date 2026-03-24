@@ -17,10 +17,10 @@ const Navbar = () => {
   }, []);
 
   const menuItems = [
-    { label: 'Home', link: '/login' },
-    { label: 'Products', link: '/login', dropdown: true },
-    { label: 'About Us', link: '/login' },
-    { label: 'Contact', link: '/login' },
+    { label: 'Home', link: '/' },
+    { label: 'Products', link: '/product', dropdown: true },
+    { label: 'About Us', link: '/about-us' },
+    { label: 'Contact', link: '/contact' },
   ];
 
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex-shrink-0 cursor-pointer flex items-center relative right-15" onClick={() => navigate('/')}>
+          <div className="flex-shrink-0 cursor-pointer flex items-center" onClick={() => navigate('/')}>
             <span><FontAwesomeIcon icon={faShoppingCart} className='text-xl px-1.5'/></span>
             <span className='text-gray-900 text-xl font-bold'>Quick</span>
             <span className='text-[#007E5D] text-xl font-bold'>kart</span>
@@ -60,7 +60,7 @@ const Navbar = () => {
           </div>
 
           {/* Right Auth Buttons */}
-          <div className="flex items-center gap-4 relative left-15">
+          <div className="flex items-center gap-4">
             <div className={`${isSmallScreen ? 'hidden' : 'flex'} items-center gap-5`}>
               <button
                 className="px-4 py-2 rounded-lg text-sm font-medium text-[#007E5D] border border-[#007E5D] hover:bg-[#007E5D] hover:text-white transition-colors"

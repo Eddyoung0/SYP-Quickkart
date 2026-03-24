@@ -314,7 +314,7 @@ const Payment = () => {
               )}
 
               {paymentMethod === 'cash-on-delivery' && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-800">
+                <div className="rounded-lg border border-[#BFE7DB] bg-[#EAF7F3] px-3 py-3 text-sm text-[#016B4F]">
                   Cash on Delivery selected. Your order will be created with payment status unpaid and delivery status processing.
                 </div>
               )}
